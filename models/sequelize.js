@@ -55,12 +55,19 @@ Account.init(
     }
 );
 
+const accountLinkingErrorMsg =
+    "An account that is already a main account cannot be used as a farm account. Please unlink all farm accounts associated with this account first";
 class AccountLink extends Model {}
 AccountLink.init(
     {
-        MainGovernorId: {
+        Id: {
             type: DataTypes.BIGINT,
             primaryKey: true,
+            autoIncrement: true,
+        },
+        MainGovernorId: {
+            type: DataTypes.BIGINT,
+            allowNull: false,
             references: {
                 model: Account,
                 key: "GovernorId",
@@ -68,7 +75,8 @@ AccountLink.init(
         },
         FarmGovernorId: {
             type: DataTypes.BIGINT,
-            primaryKey: true,
+            allowNull: false,
+            unique: true, // Ensure a farm can only belong to one main account
             references: {
                 model: Account,
                 key: "GovernorId",
@@ -80,6 +88,42 @@ AccountLink.init(
         modelName: "AccountLink",
         tableName: "AccountLinks",
         timestamps: false,
+        indexes: [
+            {
+                fields: ["MainGovernorId"],
+                name: "idx_main_governor",
+            },
+        ],
+        hooks: {
+            beforeCreate: async (accountLink, options) => {
+                // Check if the farm account is already a main account somewhere
+                const existingMainAccount = await AccountLink.findOne({
+                    where: {
+                        MainGovernorId: accountLink.FarmGovernorId,
+                    },
+                    transaction: options.transaction,
+                });
+
+                if (existingMainAccount) {
+                    throw new Error(accountLinkingErrorMsg);
+                }
+            },
+            beforeUpdate: async (accountLink, options) => {
+                // Only run this check if FarmGovernorId is being updated
+                if (accountLink.changed("FarmGovernorId")) {
+                    const existingMainAccount = await AccountLink.findOne({
+                        where: {
+                            MainGovernorId: accountLink.FarmGovernorId,
+                        },
+                        transaction: options.transaction,
+                    });
+
+                    if (existingMainAccount) {
+                        throw new Error(accountLinkingErrorMsg);
+                    }
+                }
+            },
+        },
     }
 );
 
@@ -244,14 +288,17 @@ Account.hasMany(AccountLink, {
     foreignKey: "MainGovernorId",
     as: "FarmAccounts",
 });
-Account.hasMany(AccountLink, {
+
+Account.hasOne(AccountLink, {
     foreignKey: "FarmGovernorId",
-    as: "MainAccounts",
+    as: "MainAccount",
 });
+
 AccountLink.belongsTo(Account, {
     foreignKey: "MainGovernorId",
     as: "MainAccount",
 });
+
 AccountLink.belongsTo(Account, {
     foreignKey: "FarmGovernorId",
     as: "FarmAccount",

@@ -181,10 +181,26 @@ class DiscordBotService {
             // Validate farm accounts
             const invalidFarmAccounts = [];
             const validFarmAccounts = [];
+            const alreadyLinkedFarmIds = [];
+
             for (const farmId of farmGovernorIds) {
                 const farmAccount = await models.Account.findByPk(farmId);
                 if (!farmAccount) {
                     invalidFarmAccounts.push({ id: farmId, name: "Unknown" });
+                    continue;
+                }
+
+                // Check if this farm account is already linked to another main account
+                const existingLink = await models.AccountLink.findOne({
+                    where: { FarmGovernorId: farmId },
+                });
+
+                if (existingLink) {
+                    // If already linked, add to already linked list
+                    alreadyLinkedFarmIds.push({
+                        farmId,
+                        currentMainId: existingLink.MainGovernorId,
+                    });
                 } else {
                     validFarmAccounts.push({
                         id: farmId,
@@ -217,12 +233,17 @@ class DiscordBotService {
                 });
             }
 
+            if (alreadyLinkedFarmIds.length > 0) {
+                responseMessage += `\nNote: The following farm accounts were already linked from another main account:\n`;
+                alreadyLinkedFarmIds.forEach((linkInfo) => {
+                    responseMessage += `- Farm Governor ID: ${linkInfo.farmId} (Already linked to Main Governor ID: ${linkInfo.currentMainId})\n`;
+                });
+            }
+
             message.reply(responseMessage);
         } catch (error) {
             logger.error("Error linking accounts:", error);
-            message.reply(
-                "Failed to link accounts. Please check the governor IDs and try again."
-            );
+            message.reply(`Failed to link accounts. ${error}`);
         }
     }
 
@@ -638,25 +659,6 @@ Last Updated: ${stats.SnapshotTime})
    d) Select your prepared CSV file
    e) Type \`!governor import\` in the message
    f) Send the message with the attached CSV
-
-**CSV File Requirements**
-- File format: .csv
-- Encoding: UTF-8
-- Separator: Comma (,)
-- First row: Column headers
-
-**Example CSV Columns**
-1. Governor ID (required)
-2. Governor Name (required)
-3. Snapshot Time (UTC) (required, format: YYYY-MM-DDTHH:mm:ssZ)
-4. Optional columns:
-   - Alliance
-   - Power
-   - Kills (T1-T5)
-   - Various statistical metrics
-
-**CSV Template Download**
-Need a template? Ask an admin to provide the latest CSV template for importing governors.
 
 **Troubleshooting**
 - Ensure all required columns are present
