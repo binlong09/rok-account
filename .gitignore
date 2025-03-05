@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# IDE settings
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+
+# Compiled files
+dist/
+build/
+
+# Dependency lock files
+package-lock.json
+yarn.lock

@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+    bot:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: governor-tracker-bot
+        restart: unless-stopped
+        user: root
+        # network_mode: host
+        environment:
+            - NODE_ENV=production
+            - SUPABASE_DB_HOST=${SUPABASE_DB_HOST}
+            - SUPABASE_DB_PORT=${SUPABASE_DB_PORT:-5432}
+            - SUPABASE_DB_NAME=${SUPABASE_DB_NAME:-postgres}
+            - SUPABASE_DB_USER=${SUPABASE_DB_USER}
+        volumes:
+            - ./logs:/app/logs
+            - .env:/app/.env
+        # Add network debugging tools
+        # entrypoint: [
+        #         "/bin/sh",
+        #         "-c",
+        #         "
+        #         echo 'Resolving host...' &&
+        #         nslookup ${SUPABASE_DB_HOST} &&
+        #         echo 'Testing connection...' &&
+        #         nc -zv ${SUPABASE_DB_HOST} ${SUPABASE_DB_PORT:-5432} &&
+        #         npm start
+        #         ",
+        #     ]

@@ -1,0 +1,38 @@
+# Dependency directories
+node_modules/
+
+# Environment files
+.env
+*.env
+
+# Logs
+logs/
+*.log
+
+# Git
+.git
+.gitignore
+
+# Development files
+nodemon.json
+README.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+
+# Dependency lock files
+# package-lock.json
+yarn.lock

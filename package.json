@@ -1,0 +1,74 @@
+{
+    "name": "governor-tracker-bot",
+    "version": "1.0.0",
+    "description": "Discord bot for tracking and managing game governor accounts",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "migrate": "npx sequelize-cli db:migrate",
+        "migrate:undo": "npx sequelize-cli db:migrate:undo",
+        "migrate:reset": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate",
+        "debug-connection": "node supabase-connection-debug.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
+    },
+    "keywords": [
+        "discord",
+        "bot",
+        "governor",
+        "tracking",
+        "game-stats"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js": "^14.14.1",
+        "dotenv": "^16.4.5",
+        "pg": "^8.11.3",
+        "pg-hstore": "^2.3.4",
+        "sequelize": "^6.37.1",
+        "sequelize-cli": "^6.6.2",
+        "winston": "^3.11.0",
+        "papaparse": "^5.4.1",
+        "node-fetch": "^3.3.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.3",
+        "eslint": "^8.56.0",
+        "eslint-config-standard": "^17.1.0",
+        "eslint-plugin-import": "^2.29.1",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^6.1.1"
+    },
+    "engines": {
+        "node": ">=16.0.0"
+    },
+    "nodemonConfig": {
+        "watch": [
+            "index.js",
+            "services/",
+            "models/",
+            "config/"
+        ],
+        "ext": "js,json",
+        "ignore": [
+            "node_modules/"
+        ]
+    },
+    "eslintConfig": {
+        "extends": "standard",
+        "rules": {
+            "semi": [
+                "error",
+                "always"
+            ],
+            "indent": [
+                "error",
+                2
+            ],
+            "no-unused-vars": "warn",
+            "camelcase": "off"
+        }
+    }
+}
