@@ -448,11 +448,11 @@ Last Updated: ${stats.SnapshotTime})
             let responseMessage = `Farm Account Details:\n`;
             responseMessage += `- Farm Governor ID: ${farmGovernorId}\n`;
             responseMessage += `- Farm Governor Name: ${farmAccount.GovernorName}\n\n`;
-            responseMessage += `Linked Main Accounts:\n`;
+            responseMessage += `Linked Main Account:\n`;
 
             links.forEach((link) => {
                 responseMessage += `- Main Governor ID: ${link.MainAccount.GovernorId}\n`;
-                responseMessage += `  Main Governor Name: ${link.MainAccount.GovernorName}\n`;
+                responseMessage += `- Main Governor Name: ${link.MainAccount.GovernorName}\n`;
             });
 
             message.reply(responseMessage);
