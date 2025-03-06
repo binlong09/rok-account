@@ -1,13 +1,10 @@
 # Use official Node.js LTS image for ARM64
-FROM --platform=linux/arm64 node:18-alpine
+FROM --platform=linux/arm64 node:18-bullseye-slim
 
-# Install system dependencies and network tools
-RUN apk add --no-cache \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
     postgresql-client \
-    bind-tools \
-    netcat-openbsd \
-    curl \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -21,23 +18,24 @@ RUN npm ci --only=production
 # Copy the rest of the application code
 COPY . .
 
-# Create logs directory with proper permissions
-RUN mkdir -p logs && chmod -R 777 logs
+# Create logs directory
+RUN mkdir -p logs
 
 # Set environment to production
 ENV NODE_ENV=production
 
+# Expose any necessary ports (if needed)
+# EXPOSE 3000
+
 # Create a non-root user
-RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
 
 # Change ownership of the app directory
 RUN chown -R nodejs:nodejs /app
 
 # Switch to non-root user
 USER nodejs
-
-# Expose any necessary ports (if needed)
-# EXPOSE 3000
 
 # Command to run the application
 CMD ["npm", "start"]
