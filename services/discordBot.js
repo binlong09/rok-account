@@ -345,6 +345,7 @@ class DiscordBotService {
                         attributes: ["GovernorName"],
                     },
                 ],
+                order: [["SnapshotTime", "DESC"]], // Order by snapshot time, most recent first
             });
 
             if (!stats) {
