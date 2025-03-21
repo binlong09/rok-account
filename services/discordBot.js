@@ -677,6 +677,7 @@ Last Updated: ${stats.SnapshotTime})
             await DatabaseService.initialize();
 
             // Login to Discord
+            console.log("BOT TOKEN: ", process.env.DISCORD_BOT_TOKEN);
             await this.client.login(process.env.DISCORD_BOT_TOKEN);
             logger.info("Bot logged in successfully");
         } catch (error) {

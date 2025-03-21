@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+    bot:
+        build:
+            context: .
+            dockerfile: Dockerfile.test
+            args:
+                - NODE_ENV=test
+        container_name: governor-tracker-bot-test
+        restart: "no"
+        user: root
+        env_file:
+            - .env.test
+        # network_mode: host
+        environment:
+            - NODE_ENV=test
+            - SUPABASE_DB_HOST=${SUPABASE_DB_HOST}
+            - SUPABASE_DB_PORT=${SUPABASE_DB_PORT:-5432}
+            - SUPABASE_DB_NAME=${SUPABASE_DB_NAME:-postgres}
+            - SUPABASE_DB_USER=${SUPABASE_DB_USER}
+            - SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD}
+            - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+        volumes:
+            - ./test-logs:/app/logs
+            - ./:/app # Mount the entire app for development
+            - /app/node_modules # Don't override node_modules
+        # Use nodemon for auto-reloading during development
+        command: >
+            sh -c "npm install nodemon -g &&
+                  nodemon --inspect=0.0.0.0:9229 index.js"
+        ports:
+            - "9229:9229" # Expose debug port
+
