@@ -10,8 +10,6 @@ services:
         container_name: governor-tracker-bot-test
         restart: "no"
         user: root
-        env_file:
-            - .env.test
         # network_mode: host
         environment:
             - NODE_ENV=test
